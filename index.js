@@ -1,17 +1,19 @@
 const express = require("express");
+const studentRoutes = require("./routes/students_routes");
+const bodyParser = require("body-parser");
+const connect = require("./api/db");
 
 const app = express();
 
-const routes = require("./routes/routes");
+//connect to db
+connect();
 
-app.use("/", routes);
+//middlewares
+app.use(bodyParser.json());
+
+//routes
+app.use("/", studentRoutes);
 
 app.listen(5001, () => {
   console.log("server running on port 5001");
 });
-
-//get retrive
-//post create
-//delete delete
-//put update/edit
-//use (CRUD) middleware
