@@ -7,13 +7,15 @@ const {
   deleteStudent,
 } = require("../controllers/students_controller");
 
+const { protect } = require("../middlewares/auth");
+
 const router = express.Router();
 
 router
   .route("/students")
-  .post(createStudent)
-  .get(getStudents)
-  .put(updateStudent)
-  .delete(deleteStudent);
+  .post(protect, createStudent)
+  .get(protect, getStudents)
+  .put(protect, updateStudent)
+  .delete(protect, deleteStudent);
 
 module.exports = router;

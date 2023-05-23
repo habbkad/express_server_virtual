@@ -1,4 +1,5 @@
 const studentModel = require("../models/student_model");
+const { findOne } = require("../models/users_model");
 
 //desc     create new student
 //route    POST /student/
@@ -6,8 +7,10 @@ const studentModel = require("../models/student_model");
 exports.createStudent = async (req, res, next) => {
   const { name, age, gen } = req.body;
 
+  const userId = req.user._id;
+
   try {
-    const student = new studentModel({ name, age, gen });
+    const student = new studentModel({ name, age, gen, userId });
     await student.save();
     res.send({ success: true, data: student });
   } catch (error) {
@@ -37,26 +40,44 @@ exports.getStudents = async (req, res, next) => {
 //route    PUT /student/
 //access   private
 exports.updateStudent = async (req, res, next) => {
-  //updating by id
-  //   const student = await studentModel.findByIdAndUpdate(
-  //     "645010757a2390e9ca65a27c",
-  //     { name: "Sam Generals" }
-  //   );
+  //get details from frontend req.body
+  const { name, gen } = req.body;
 
-  //updating by data search
-  const student = await studentModel.updateOne(
-    { name: "Kingsly" },
-    { name: "Kingsley" }
-  );
+  //get req.user
+  const userId = req.user._id;
 
-  res.send({ success: true, data: student });
+  const user = await studentModel.findOne({ name });
+
+  if (!user) {
+    return res.send({ success: false, messsage: "data not found" });
+  }
+
+  if (user.userId.toString() !== userId.toString()) {
+    return res.send({ success: false, messsage: "access denied" });
+  }
+
+  const student = await studentModel.findByIdAndUpdate(user._id, { gen });
+
+  return res.send({ success: true, data: student });
 };
 
 //desc     delete student
 //route    DELETE /student/
 //access   private
 exports.deleteStudent = async (req, res, next) => {
-  //delet with querry
-  const student = await studentModel.findOneAndDelete({ name: "Sarah yu" });
+  const { name } = req.body;
+  const userId = req.user._id;
+
+  const user = await studentModel.findOne({ name });
+  if (!user) {
+    return res.send({ success: false, messsage: "data not found" });
+  }
+
+  if (user.userId.toString() !== userId.toString()) {
+    return res.send({ success: false, messsage: "access denied" });
+  }
+
+  //delete with querry
+  const student = await studentModel.findOneAndDelete({ name });
   res.send({ success: true, data: student });
 };

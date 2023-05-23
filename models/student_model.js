@@ -6,7 +6,8 @@ const studentSchema = new Schema({
   name: { type: String, required: true },
   age: { type: Number, required: true },
   gen: String,
-  date: { type: Date },
+  userId: mongoose.ObjectId,
+  date: { type: Date, default: Date.now() },
 });
 
 const studentModel = mongoose.model("students", studentSchema);
